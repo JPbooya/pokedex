@@ -1,15 +1,45 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View, Image } from "react-native";
+import { ScrollView, Text, View, Image, StyleSheet} from "react-native";
 
 interface Pokemon {
   name:string;
   image:string;
+  types: PokemonType[];
 }
+
+interface PokemonType {
+  type:{
+    name: string;
+    url: string;
+  };
+}
+
+const colorsByType: Record<string, string> = {
+  normal: "#A8A878",
+  fire: "#F08030",
+  water: "#6890F0",
+  electric: "#F8D030",
+  grass: "#78C850",
+  ice: "#98D8D8",
+  fighting: "#C03028",
+  poison: "#A040A0",
+  ground: "#E0C068",
+  flying: "#A890F0",
+  psychic: "#F85888",
+  bug: "#A8B820",
+  rock: "#B8A038",
+  ghost: "#705898",
+  dragon: "#7038F8",
+  dark: "#705848",
+  steel: "#B8B8D0",
+  fairy: "#EE99AC",
+};
 
 export default function Index() {
 
  const [pokemons, setPokemons] =  useState<Pokemon[]>([]);
 
+  console.log(JSON.stringify(pokemons[0], null, 2));
   useEffect(() => {
     // fetch pokemons 
     fetchPokemons()
@@ -30,6 +60,7 @@ export default function Index() {
           return {
             name: pokemon.name,
             image: details.sprites.front_default,
+            types: details.types,
           };
         })
       );
@@ -44,16 +75,43 @@ export default function Index() {
   }
 
   return (
-   <ScrollView>
+   <ScrollView
+      contentContainerStyle={{
+        gap: 16,
+        padding: 16,
+      }}
+    >
     {pokemons.map((pokemon) => (
-    <View key={pokemon.name}>
-      <Text>{pokemon.image}</Text>
-      <Image
-        source={{uri: pokemon.image}}
-        style={{width: 100, height: 100}}
-      />
+    <View key={pokemon.name} 
+      style= {{
+        // @ts-ignore
+        backgroundColor: colorsByType[pokemon.types[0].type.name],
+    }}>
+      <Text style={styles.name}>{pokemon.name}</Text>
+      <Text style={styles.type}>{pokemon.types[0].type.name}</Text>
+
+      <View style= {{
+        flexDirection: "row",
+      }}
+      >
+        <Image
+          source={{uri: pokemon.image}}
+          style={{width: 150, height: 150}}
+        />
+      </View>
     </View>
     ))}
    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  name: {
+    fontSize:20,
+    fontWeight: 'bold',
+  },
+   type: {
+    fontSize:20,
+    fontWeight: 'bold',
+  }
+})
